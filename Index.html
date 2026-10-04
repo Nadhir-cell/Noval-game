@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
+<title>NOVAL GAME</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#020617;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+}
+
+#game{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    height:100vh;
+    overflow:hidden;
+    background:#020617;
+}
+
+canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+/* HUD */
+
+#hud{
+    position:absolute;
+    top:15px;
+    left:15px;
+    right:15px;
+    z-index:10;
+
+    display:flex;
+    justify-content:space-between;
+
+    pointer-events:none;
+}
+
+.info{
+    min-width:78px;
+    padding:8px 10px;
+
+    text-align:center;
+
+    border-radius:14px;
+
+    background:rgba(2,6,23,.65);
+
+    border:1px solid rgba(56,189,248,.4);
+
+    box-shadow:
+        0 0 15px rgba(34,211,238,.15);
+
+    backdrop-filter:blur(8px);
+
+    color:white;
+}
+
+.info small{
+    display:block;
+    color:#67e8f9;
+    font-size:9px;
+    letter-spacing:2px;
+}
+
+.info strong{
+    display:block;
+    margin-top:3px;
+    font-size:20px;
+}
+
+/* MUSIC BUTTON */
+
+#musicButton{
+    position:absolute;
+    top:82px;
+    right:15px;
+
+    z-index:20;
+
+    width:45px;
+    height:45px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(125,211,252,.5);
+
+    background:rgba(2,6,23,.7);
+
+    color:white;
+
+    font-size:20px;
+
+    box-shadow:
+        0 0 15px rgba(34,211,238,.2);
+
+    backdrop-filter:blur(8px);
+
+    cursor:pointer;
+}
+
+#musicButton:active{
+    transform:scale(.9);
+}
+
+/* SCREENS */
+
+.screen{
+    position:absolute;
+    inset:0;
+
+    z-index:30;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
+    background:rgba(2,6,23,.45);
+
+    backdrop-filter:blur(4px);
+}
+
+.panel{
+    width:min(92%,440px);
+
+    padding:30px 22px;
+
+    text-align:center;
+
+    border-radius:27px;
+
+    background:rgba(5,10,30,.88);
+
+    border:1px solid rgba(56,189,248,.45);
+
+    box-shadow:
+        0 0 35px rgba(34,211,238,.18),
+        inset 0 0 30px rgba(56,189,248,.04);
+}
+
+.title{
+    font-size:42px;
+    font-weight:900;
+
+    letter-spacing:4px;
+
+    color:white;
+
+    text-shadow:
+        0 0 8px #22d3ee,
+        0 0 20px #0ea5e9,
+        0 0 40px #2563eb;
+}
+
+.subtitle{
+    margin-top:8px;
+
+    color:#67e8f9;
+
+    font-size:13px;
+
+    letter-spacing:3px;
+}
+
+.description{
+    margin:23px 0;
+
+    color:#cbd5e1;
+
+    font-size:14px;
+
+    line-height:1.9;
+}
+
+.description b{
+    color:#67e8f9;
+}
+
+.gameButton{
+    padding:14px 32px;
+
+    border:0;
+    border-radius:16px;
+
+    color:white;
+
+    font-size:16px;
+    font-weight:bold;
+
+    background:
+        linear-gradient(
+            135deg,
+            #06b6d4,
+            #2563eb
+        );
+
+    box-shadow:
+        0 0 20px rgba(34,211,238,.3),
+        inset 0 1px rgba(255,255,255,.4);
+
+    cursor:pointer;
+}
+
+.gameButton:active{
+    transform:scale(.94);
+}
+
+/* GAME OVER */
+
+#gameOver{
+    display:none;
+}
+
+.overTitle{
+    color:#f87171;
+
+    font-size:36px;
+
+    font-weight:900;
+
+    text-shadow:
+        0 0 15px rgba(248,113,113,.6);
+}
+
+.result{
+    margin:20px 0;
+
+    color:#cbd5e1;
+
+    line-height:1.8;
+}
+
+.scoreNumber{
+    display:block;
+
+    color:#67e8f9;
+
+    font-size:40px;
+
+    font-weight:bold;
+
+    text-shadow:
+        0 0 15px #06b6d4;
+}
+
+/* JUMP */
+
+#controls{
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:25px;
+
+    z-index:15;
+
+    display:flex;
+    justify-content:center;
+
+    pointer-events:none;
+}
+
+#jump{
+    width:135px;
+    height:55px;
+
+    border-radius:30px;
+
+    border:1px solid rgba(125,211,252,.5);
+
+    background:rgba(14,165,233,.25);
+
+    color:white;
+
+    font-size:15px;
+    font-weight:bold;
+
+    backdrop-filter:blur(8px);
+
+    box-shadow:
+        0 0 20px rgba(34,211,238,.2);
+
+    pointer-events:auto;
+}
+
+#jump:active{
+    transform:scale(.94);
+}
+
+/* ROTATE */
+
+#rotate{
+    display:none;
+
+    position:absolute;
+    inset:0;
+
+    z-index:100;
+
+    background:#020617;
+
+    color:white;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+}
+
+@media(max-height:430px) and (orientation:landscape){
+    #rotate{
+        display:flex;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<canvas id="canvas"></canvas>
+
+<!-- HUD -->
+
+<div id="hud">
+
+    <div class="info">
+        <small>SCORE</small>
+        <strong id="score">0</strong>
+    </div>
+
+    <div class="info">
+        <small>LEVEL</small>
+        <strong id="level">1</strong>
+    </div>
+
+    <div class="info">
+        <small>BEST</small>
+        <strong id="best">0</strong>
+    </div>
+
+</div>
+
+
+<!-- MUSIC BUTTON -->
+
+<button id="musicButton">🔊</button>
+
+
+<!-- MENU -->
+
+<div id="menu" class="screen">
+
+    <div class="panel">
+
+        <div class="title">
+            NOVAL GAME
+        </div>
+
+        <div class="subtitle">
+            RUN • JUMP • SURVIVE
+        </div>
+
+        <div class="description">
+
+            🏃 Lari sejauh mungkin<br>
+
+            🚧 Hindari rintangan<br>
+
+            🪙 Ambil koin<br>
+
+            ⚡ Kecepatan terus meningkat<br>
+
+            🏆 Pecahkan skor terbaik<br><br>
+
+            <b>
+                TAP LAYAR ATAU TEKAN JUMP
+            </b>
+
+        </div>
+
+        <button
+            class="gameButton"
+            id="start">
+            ▶ MULAI GAME
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- GAME OVER -->
+
+<div id="gameOver" class="screen">
+
+    <div class="panel">
+
+        <div class="overTitle">
+            GAME OVER
+        </div>
+
+        <div class="result">
+
+            Skor Kamu
+
+            <span
+                class="scoreNumber"
+                id="finalScore">
+                0
+            </span>
+
+            🏆 Best Score:
+            <b id="finalBest">0</b>
+
+        </div>
+
+        <button
+            class="gameButton"
+            id="restart">
+            ↻ MAIN LAGI
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- JUMP BUTTON -->
+
+<div id="controls">
+
+    <button id="jump">
+        ▲ JUMP
+    </button>
+
+</div>
+
+
+<!-- ROTATE -->
+
+<div id="rotate">
+
+    <div>
+        <h2>📱 Putar HP</h2>
+        <p>Gunakan mode portrait untuk bermain.</p>
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   CANVAS
+===================================== */
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+let W,H,ground;
+
+function resize(){
+
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=window.innerHeight;
+
+    ground=H*.82;
+}
+
+window.addEventListener("resize",resize);
+
+resize();
+
+
+/* =====================================
+   UI
+===================================== */
+
+const menu=
+document.getElementById("menu");
+
+const gameOver=
+document.getElementById("gameOver");
+
+const scoreUI=
+document.getElementById("score");
+
+const levelUI=
+document.getElementById("level");
+
+const bestUI=
+document.getElementById("best");
+
+const finalScore=
+document.getElementById("finalScore");
+
+const finalBest=
+document.getElementById("finalBest");
+
+const startButton=
+document.getElementById("start");
+
+const restartButton=
+document.getElementById("restart");
+
+const jumpButton=
+document.getElementById("jump");
+
+const musicButton=
+document.getElementById("musicButton");
+
+
+/* =====================================
+   GAME
+===================================== */
+
+let running=false;
+
+let score=0;
+
+let level=1;
+
+let speed=6;
+
+let highScore=
+Number(
+    localStorage.getItem(
+        "novalGameBest"
+    )||0
+);
+
+bestUI.textContent=highScore;
+
+let obstacleTimer=60;
+
+let coinTimer=100;
+
+let obstacles=[];
+
+let coins=[];
+
+let particles=[];
+
+let stars=[];
+
+
+/* =====================================
+   STARS
+===================================== */
+
+for(let i=0;i<100;i++){
+
+    stars.push({
+
+        x:Math.random(),
+
+        y:Math.random()*.7,
+
+        size:Math.random()*2+.5,
+
+        alpha:Math.random()*.8+.2,
+
+        speed:Math.random()*.5+.1
+
+    });
+
+}
+
+
+/* =====================================
+   PLAYER
+===================================== */
+
+const player={
+
+    x:80,
+
+    y:0,
+
+    w:38,
+
+    h:55,
+
+    vy:0,
+
+    gravity:.8,
+
+    jumpPower:-15,
+
+    grounded:false,
+
+    rotation:0
+
+};
+
+
+/* =====================================
+   MUSIC SYSTEM
+   Musik dibuat dengan Web Audio
+===================================== */
+
+let audioContext=null;
+
+let masterGain=null;
+
+let musicTimer=null;
+
+let musicOn=true;
+
+let musicStep=0;
+
+
+/* Membuat audio */
+
+function initAudio(){
+
+    if(audioContext)
+        return;
+
+    audioContext=
+    new (
+        window.AudioContext ||
+        window.webkitAudioContext
+    )();
+
+    masterGain=
+    audioContext.createGain();
+
+    masterGain.gain.value=.055;
+
+    masterGain.connect(
+        audioContext.destination
+    );
+
+}
+
+
+/* Nada musik */
+
+function playNote(
+    frequency,
+    duration=.15,
+    volume=1.0
+){
+
+    if(!musicOn)
+        return;
+
+    if(!audioContext)
+        return;
+
+    const oscillator=
+    audioContext.createOscillator();
+
+    const gain=
+    audioContext.createGain();
+
+    oscillator.type="square";
+
+    oscillator.frequency.value=
+    frequency;
+
+    gain.gain.setValueAtTime(
+        0,
+        audioContext.currentTime
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        volume,
+        audioContext.currentTime+.01
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioContext.currentTime+
+        duration
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(masterGain);
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime+
+        duration+.02
+    );
+
+}
+
+
+/* Melodi */
+
+const melody=[
+
+    261.63,
+    329.63,
+    392.00,
+    329.63,
+
+    293.66,
+    349.23,
+    440.00,
+    349.23,
+
+    261.63,
+    329.63,
+    392.00,
+    523.25,
+
+    440.00,
+    392.00,
+    329.63,
+    261.63
+
+];
+
+
+function startMusic(){
+
+    initAudio();
+
+    if(
+        audioContext.state==="suspended"
+    ){
+        audioContext.resume();
+    }
+
+    if(musicTimer)
+        return;
+
+    musicStep=0;
+
+    musicTimer=
+    setInterval(
+        function(){
+
+            if(
+                !musicOn
+            )
+                return;
+
+            playNote(
+                melody[musicStep],
+                .20,
+                .045
+            );
+
+            musicStep++;
+
+            if(
+                musicStep>=melody.length
+            ){
+                musicStep=0;
+            }
+
+        },
+        220
+    );
+
+}
+
+
+/* Musik ON/OFF */
+
+function toggleMusic(){
+
+    musicOn=!musicOn;
+
+    musicButton.textContent=
+        musicOn ? "🔊" : "🔇";
+
+    if(musicOn){
+
+        startMusic();
+
+    }
+
+}
+
+musicButton.addEventListener(
+    "click",
+    toggleMusic
+);
+
+
+/* =====================================
+   SOUND EFFECT
+===================================== */
+
+function soundJump(){
+
+    if(!musicOn)
+        return;
+
+    initAudio();
+
+    playNote(
+        520,
+        .08,
+        .08
+    );
+
+}
+
+
+function soundCoin(){
+
+    if(!musicOn)
+        return;
+
+    initAudio();
+
+    playNote(
+        880,
+        .08,
+        .09
+    );
+
+    setTimeout(
+        function(){
+
+            playNote(
+                1200,
+                .1,
+                .07
+            );
+
+        },
+        70
+    );
+
+}
+
+
+function soundGameOver(){
+
+    if(!musicOn)
+        return;
+
+    initAudio();
+
+    playNote(
+        220,
+        .2,
+        .09
+    );
+
+    setTimeout(
+        function(){
+
+            playNote(
+                165,
+                .3,
+                .08
+            );
+
+        },
+        150
+    );
+
+}
+
+
+/* =====================================
+   RESET
+===================================== */
+
+function reset(){
+
+    score=0;
+
+    level=1;
+
+    speed=6;
+
+    obstacles=[];
+
+    coins=[];
+
+    particles=[];
+
+    obstacleTimer=60;
+
+    coinTimer=100;
+
+    player.x=
+        Math.max(50,W*.12);
+
+    player.y=
+        ground-player.h;
+
+    player.vy=0;
+
+    player.grounded=true;
+
+    player.rotation=0;
+
+    scoreUI.textContent="0";
+
+    levelUI.textContent="1";
+
+}
+
+
+/* =====================================
+   START
+===================================== */
+
+function startGame(){
+
+    reset();
+
+    menu.style.display="none";
+
+    gameOver.style.display="none";
+
+    running=true;
+
+    startMusic();
+
+    requestAnimationFrame(loop);
+
+}
+
+startButton.onclick=startGame;
+
+restartButton.onclick=startGame;
+
+
+/* =====================================
+   JUMP
+===================================== */
+
+function jump(){
+
+    if(!running)
+        return;
+
+    if(player.grounded){
+
+        player.vy=
+            player.jumpPower;
+
+        player.grounded=false;
+
+        soundJump();
+
+        createParticles(
+            player.x+
+            player.w/2,
+            ground,
+            8
+        );
+
+    }
+
+}
+
+
+/* KEYBOARD */
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.code==="Space"||
+            e.code==="ArrowUp"||
+            e.code==="KeyW"
+        ){
+
+            e.preventDefault();
+
+            jump();
+
+        }
+
+    }
+);
+
+
+/* TOUCH */
+
+canvas.addEventListener(
+    "pointerdown",
+    function(){
+
+        jump();
+
+    }
+);
+
+jumpButton.addEventListener(
+    "pointerdown",
+    function(e){
+
+        e.preventDefault();
+
+        jump();
+
+    }
+);
+
+
+/* =====================================
+   OBSTACLE
+===================================== */
+
+function createObstacle(){
+
+    let w,h;
+
+    if(Math.random()<.6){
+
+        w=
+            28+
+            Math.random()*22;
+
+        h=
+            35+
+            Math.random()*35;
+
+    }else{
+
+        w=
+            45+
+            Math.random()*35;
+
+        h=
+            25+
+            Math.random()*25;
+
+    }
+
+    obstacles.push({
+
+        x:W+50,
+
+        y:ground-h,
+
+        w:w,
+
+        h:h
+
+    });
+
+}
+
+
+/* =====================================
+   COIN
+===================================== */
+
+function createCoin(){
+
+    coins.push({
+
+        x:W+30,
+
+        y:
+            ground-
+            80-
+            Math.random()*100,
+
+        r:11,
+
+        angle:0
+
+    });
+
+}
+
+
+/* =====================================
+   PARTICLES
+===================================== */
+
+function createParticles(
+    x,y,count
+){
+
+    for(
+        let i=0;
+        i<count;
+        i++
+    ){
+
+        particles.push({
+
+            x:x,
+
+            y:y,
+
+            vx:
+                (Math.random()-.5)*6,
+
+            vy:
+                (Math.random()-.5)*6,
+
+            life:1,
+
+            size:
+                Math.random()*4+2
+
+        });
+
+    }
+
+}
+
+
+/* =====================================
+   COLLISION
+===================================== */
+
+function collision(a,b){
+
+    return(
+
+        a.x<b.x+b.w&&
+
+        a.x+a.w>b.x&&
+
+        a.y<b.y+b.h&&
+
+        a.y+a.h>b.y
+
+    );
+
+}
+
+
+/* =====================================
+   UPDATE
+===================================== */
+
+function update(){
+
+    level=
+        Math.floor(score/500)+1;
+
+    speed=
+        6+
+        (level-1)*.65;
+
+    levelUI.textContent=level;
+
+
+    score+=
+        .12+
+        level*.015;
+
+    scoreUI.textContent=
+        Math.floor(score);
+
+
+    /* PLAYER */
+
+    player.vy+=
+        player.gravity;
+
+    player.y+=
+        player.vy;
+
+
+    if(
+        player.y+
+        player.h>=
+        ground
+    ){
+
+        player.y=
+            ground-player.h;
+
+        player.vy=0;
+
+        player.grounded=true;
+
+        player.rotation=0;
+
+    }else{
+
+        player.rotation+=.08;
+
+    }
+
+
+    /* OBSTACLES */
+
+    obstacleTimer--;
+
+    if(
+        obstacleTimer<=0
+    ){
+
+        createObstacle();
+
+        obstacleTimer=
+            Math.max(
+                50,
+                100-level*5
+            )+
+            Math.random()*50;
+
+    }
+
+
+    for(
+        let i=obstacles.length-1;
+        i>=0;
+        i--
+    ){
+
+        const o=
+            obstacles[i];
+
+        o.x-=speed;
+
+
+        if(
+            collision(
+                player,
+                o
+            )
+        ){
+
+            endGame();
+
+            return;
+
+        }
+
+
+        if(
+            o.x+o.w<-50
+        ){
+
+            obstacles.splice(i,1);
+
+        }
+
+    }
+
+
+    /* COINS */
+
+    coinTimer--;
+
+    if(
+        coinTimer<=0
+    ){
+
+        createCoin();
+
+        coinTimer=
+            130+
+            Math.random()*130;
+
+    }
+
+
+    for(
+        let i=coins.length-1;
+        i>=0;
+        i--
+    ){
+
+        const c=
+            coins[i];
+
+        c.x-=speed;
+
+        c.angle+=.12;
+
+
+        const dx=
+            player.x+
+            player.w/2-
+            c.x;
+
+        const dy=
+            player.y+
+            player.h/2-
+            c.y;
+
+        const distance=
+            Math.sqrt(
+                dx*dx+
+                dy*dy
+            );
+
+
+        if(
+            distance<
+            c.r+25
+        ){
+
+            score+=50;
+
+            soundCoin();
+
+            createParticles(
+                c.x,
+                c.y,
+                15
+            );
+
+            coins.splice(i,1);
+
+            continue;
+
+        }
+
+
+        if(c.x<-30){
+
+            coins.splice(i,1);
+
+        }
+
+    }
+
+
+    /* PARTICLES */
+
+    for(
+        let i=particles.length-1;
+        i>=0;
+        i--
+    ){
+
+        const p=
+            particles[i];
+
+        p.x+=p.vx;
+
+        p.y+=p.vy;
+
+        p.vy+=.12;
+
+        p.life-=.025;
+
+
+        if(p.life<=0){
+
+            particles.splice(i,1);
+
+        }
+
+    }
+
+}
+
+
+/* =====================================
+   BACKGROUND
+===================================== */
+
+function drawBackground(){
+
+    const gradient=
+        ctx.createLinearGradient(
+            0,0,0,H
+        );
+
+    gradient.addColorStop(
+        0,
+        "#020617"
+    );
+
+    gradient.addColorStop(
+        .55,
+        "#0f172a"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#020617"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.fillRect(
+        0,0,W,H
+    );
+
+
+    /* MOON */
+
+    ctx.beginPath();
+
+    ctx.arc(
+        W*.78,
+        H*.18,
+        Math.min(W,H)*.07,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle="#e0f2fe";
+
+    ctx.shadowBlur=35;
+
+    ctx.shadowColor="#7dd3fc";
+
+    ctx.fill();
+
+    ctx.shadowBlur=0;
+
+
+    /* STARS */
+
+    stars.forEach(
+        function(s){
+
+            let x=
+                (
+                    s.x*W-
+                    score*s.speed*.12
+                )%W;
+
+            if(x<0)
+                x+=W;
+
+            const y=s.y*H;
+
+            ctx.globalAlpha=s.alpha;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                s.size,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle="#bae6fd";
+
+            ctx.fill();
+
+        }
+    );
+
+    ctx.globalAlpha=1;
+
+
+    /* CITY */
+
+    for(
+        let i=0;
+        i<20;
+        i++
+    ){
+
+        const width=
+            25+
+            (i%4)*12;
+
+        const height=
+            30+
+            ((i*37)%90);
+
+        const x=
+            i*(W/18);
+
+        ctx.fillStyle=
+            "rgba(15,23,42,.9)";
+
+        ctx.fillRect(
+            x,
+            ground-height,
+            width,
+            height
+        );
+
+    }
+
+
+    /* GROUND */
+
+    ctx.fillStyle="#020617";
+
+    ctx.fillRect(
+        0,
+        ground,
+        W,
+        H-ground
+    );
+
+
+    /* NEON LINE */
+
+    ctx.beginPath();
+
+    ctx.moveTo(0,ground);
+
+    ctx.lineTo(W,ground);
+
+    ctx.strokeStyle="#22d3ee";
+
+    ctx.lineWidth=2;
+
+    ctx.shadowBlur=15;
+
+    ctx.shadowColor="#22d3ee";
+
+    ctx.stroke();
+
+    ctx.shadowBlur=0;
+
+
+    /* GRID */
+
+    for(
+        let x=-100;
+        x<W+100;
+        x+=70
+    ){
+
+        let offset=
+            (
+                x-
+                score*3
+            )%70;
+
+        ctx.strokeStyle=
+            "rgba(34,211,238,.13)";
+
+        ctx.lineWidth=1;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x+offset,
+            ground
+        );
+
+        ctx.lineTo(
+            x+offset-45,
+            H
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+/* =====================================
+   PLAYER
+===================================== */
+
+function drawPlayer(){
+
+    const cx=
+        player.x+
+        player.w/2;
+
+    const cy=
+        player.y+
+        player.h/2;
+
+    ctx.save();
+
+    ctx.translate(
+        cx,
+        cy
+    );
+
+
+    if(!player.grounded){
+
+        ctx.rotate(
+            player.rotation
+        );
+
+    }
+
+
+    const gradient=
+        ctx.createLinearGradient(
+            -20,-25,
+            20,25
+        );
+
+    gradient.addColorStop(
+        0,
+        "#67e8f9"
+    );
+
+    gradient.addColorStop(
+        .5,
+        "#0ea5e9"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#2563eb"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.shadowBlur=18;
+
+    ctx.shadowColor="#22d3ee";
+
+
+    roundRect(
+        ctx,
+        -19,
+        -27,
+        38,
+        54,
+        10
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur=0;
+
+
+    /* EYES */
+
+    ctx.fillStyle="#020617";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -7,
+        -5,
+        3,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        7,
+        -5,
+        3,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* VISOR */
+
+    ctx.fillStyle=
+        "rgba(255,255,255,.4)";
+
+    roundRect(
+        ctx,
+        -13,
+        -17,
+        26,
+        5,
+        3
+    );
+
+    ctx.fill();
+
+
+    /* LEGS */
+
+    ctx.strokeStyle="#38bdf8";
+
+    ctx.lineWidth=5;
+
+    ctx.lineCap="round";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -9,
+        25
+    );
+
+    ctx.lineTo(
+        -12,
+        32
+    );
+
+    ctx.moveTo(
+        9,
+        25
+    );
+
+    ctx.lineTo(
+        12,
+        32
+    );
+
+    ctx.stroke();
+
+    ctx.restore();
+
+}
+
+
+/* =====================================
+   OBSTACLES
+===================================== */
+
+function drawObstacles(){
+
+    obstacles.forEach(
+        function(o){
+
+            const gradient=
+                ctx.createLinearGradient(
+                    o.x,
+                    o.y,
+                    o.x+o.w,
+                    o.y+o.h
+                );
+
+            gradient.addColorStop(
+                0,
+                "#fb7185"
+            );
+
+            gradient.addColorStop(
+                .5,
+                "#ef4444"
+            );
+
+            gradient.addColorStop(
+                1,
+                "#991b1b"
+            );
+
+            ctx.fillStyle=gradient;
+
+            ctx.shadowBlur=15;
+
+            ctx.shadowColor="#ef4444";
+
+
+            roundRect(
+                ctx,
+                o.x,
+                o.y,
+                o.w,
+                o.h,
+                7
+            );
+
+            ctx.fill();
+
+            ctx.shadowBlur=0;
+
+
+            /* SPIKES */
+
+            ctx.fillStyle="#fecaca";
+
+            for(
+                let x=o.x+6;
+                x<o.x+o.w-4;
+                x+=12
+            ){
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+                    x,
+                    o.y
+                );
+
+                ctx.lineTo(
+                    x+6,
+                    o.y-8
+                );
+
+                ctx.lineTo(
+                    x+12,
+                    o.y
+                );
+
+                ctx.closePath();
+
+                ctx.fill();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   COINS
+===================================== */
+
+function drawCoins(){
+
+    coins.forEach(
+        function(c){
+
+            ctx.save();
+
+            ctx.translate(
+                c.x,
+                c.y
+            );
+
+            const scale=
+                Math.abs(
+                    Math.cos(c.angle)
+                );
+
+            ctx.scale(
+                Math.max(.2,scale),
+                1
+            );
+
+            ctx.beginPath();
+
+            ctx.arc(
+                0,
+                0,
+                c.r,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle="#facc15";
+
+            ctx.shadowBlur=20;
+
+            ctx.shadowColor="#facc15";
+
+            ctx.fill();
+
+            ctx.shadowBlur=0;
+
+            ctx.fillStyle="#fff7ed";
+
+            ctx.font=
+                "bold 12px Arial";
+
+            ctx.textAlign="center";
+
+            ctx.textBaseline="middle";
+
+            ctx.fillText(
+                "$",
+                0,
+                1
+            );
+
+            ctx.restore();
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   PARTICLES
+===================================== */
+
+function drawParticles(){
+
+    particles.forEach(
+        function(p){
+
+            ctx.globalAlpha=
+                p.life;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                p.x,
+                p.y,
+                p.size,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle="#67e8f9";
+
+            ctx.fill();
+
+        }
+    );
+
+    ctx.globalAlpha=1;
+
+}
+
+
+/* =====================================
+   ROUND RECT
+===================================== */
+
+function roundRect(
+    ctx,
+    x,
+    y,
+    width,
+    height,
+    radius
+){
+
+    radius=
+        Math.min(
+            radius,
+            width/2,
+            height/2
+        );
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x+radius,
+        y
+    );
+
+    ctx.arcTo(
+        x+width,
+        y,
+        x+width,
+        y+height,
+        radius
+    );
+
+    ctx.arcTo(
+        x+width,
+        y+height,
+        x,
+        y+height,
+        radius
+    );
+
+    ctx.arcTo(
+        x,
+        y+height,
+        x,
+        y,
+        radius
+    );
+
+    ctx.arcTo(
+        x,
+        y,
+        x+width,
+        y,
+        radius
+    );
+
+    ctx.closePath();
+
+}
+
+
+/* =====================================
+   DRAW
+===================================== */
+
+function draw(){
+
+    drawBackground();
+
+    drawCoins();
+
+    drawObstacles();
+
+    drawPlayer();
+
+    drawParticles();
+
+}
+
+
+/* =====================================
+   GAME LOOP
+===================================== */
+
+function loop(){
+
+    if(!running)
+        return;
+
+    update();
+
+    draw();
+
+    requestAnimationFrame(loop);
+
+}
+
+
+/* =====================================
+   GAME OVER
+===================================== */
+
+function endGame(){
+
+    running=false;
+
+    soundGameOver();
+
+    const final=
+        Math.floor(score);
+
+
+    if(
+        final>highScore
+    ){
+
+        highScore=final;
+
+        localStorage.setItem(
+            "novalGameBest",
+            highScore
+        );
+
+    }
+
+
+    bestUI.textContent=
+        highScore;
+
+    finalScore.textContent=
+        final;
+
+    finalBest.textContent=
+        highScore;
+
+
+    createParticles(
+        player.x+
+        player.w/2,
+        player.y+
+        player.h/2,
+        30
+    );
+
+
+    gameOver.style.display=
+        "flex";
+
+    draw();
+
+}
+
+
+/* =====================================
+   INITIAL
+===================================== */
+
+reset();
+
+draw();
+
+</script>
+
+</body>
+</html>
